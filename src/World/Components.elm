@@ -1,6 +1,6 @@
 module World.Components exposing (..)
 
-import Slime exposing (componentSpec)
+import Slime exposing (componentSpec, deleteEntity, (&->), EntityDeletor)
 
 
 type alias Transform =
@@ -13,3 +13,7 @@ type alias Transform =
 
 transforms =
     componentSpec .transforms (\transforms world -> { world | transforms = transforms })
+
+
+deletor =
+    deleteEntity transforms

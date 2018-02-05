@@ -1,18 +1,26 @@
 module Main exposing (main)
 
-{-| @docs main
+{-| Program entrance.
+
+@docs main
+
 -}
 
 import Html exposing (div)
-import World.Model exposing (WorldModel, WorldMsg, initModel)
+import Slime.Engine
+import World.Model exposing (WorldModel, initModel)
+import World.Msg exposing (WorldMsg)
+import Render.View exposing (view)
+import World.DebugScene exposing (debugScene1)
+import World.Engine exposing (update, subscriptions)
 
 
 {-| -}
-main : Program Never WorldModel WorldMsg
+main : Program Never WorldModel (Slime.Engine.Message WorldMsg)
 main =
     Html.program
-        { init = ( initModel, Cmd.none )
-        , update = \msg model -> ( model, Cmd.none )
-        , subscriptions = \model -> Sub.none
-        , view = \model -> (div [] [])
+        { init = ( initModel |> debugScene1, Cmd.none )
+        , update = update
+        , subscriptions = subscriptions
+        , view = view
         }
