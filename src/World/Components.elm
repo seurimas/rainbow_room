@@ -15,5 +15,26 @@ transforms =
     componentSpec .transforms (\transforms world -> { world | transforms = transforms })
 
 
+type alias Inertia =
+    { vx : Float
+    , vy : Float
+    , falls : Bool
+    }
+
+
+inertias =
+    componentSpec .inertias (\inertias world -> { world | inertias = inertias })
+
+
+type alias Gun =
+    { sinceLast : Float
+    , cooldown : Float
+    }
+
+
+guns =
+    componentSpec .guns (\guns world -> { world | guns = guns })
+
+
 deletor =
     deleteEntity transforms

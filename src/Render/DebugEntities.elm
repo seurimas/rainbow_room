@@ -12,4 +12,4 @@ debugs world =
     world
         &. (entities transforms)
         |> List.map .a
-        |> List.map (\{ x, y, width, height } -> shape rectangle { color = black, position = ( x, y ), size = ( width, height ) })
+        |> List.map (\{ x, y, width, height } -> shape rectangle { color = black, position = ( x - width / 2, y - height / 2 ), size = ( width, height ) })
