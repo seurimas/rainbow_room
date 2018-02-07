@@ -6,7 +6,7 @@ import Input.Listeners exposing (..)
 import World.Msg exposing (..)
 import World.Components exposing (..)
 import World.DebugScene exposing (debugMover, debugShooter)
-import World.Physical exposing (applyTransformInertia, applyGravity)
+import World.Physical exposing (applyTransformInertia, applyGravity, stopSolids)
 
 
 engine =
@@ -15,6 +15,7 @@ engine =
         , timedSystem debugShooter
         , timedSystem applyTransformInertia
         , timedSystem applyGravity
+        , untimedSystem stopSolids
         ]
         [ listenerMap intoInputMsg outOfInputMsg keyListener
         ]

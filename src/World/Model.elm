@@ -24,6 +24,9 @@ type alias WorldModel =
         { transforms : ComponentSet Transform
         , inertias : ComponentSet Inertia
         , guns : ComponentSet Gun
+        , solids : ComponentSet Solid
+        , barriers : ComponentSet Barrier
+        , players : ComponentSet Bool
         , renderConfig : RenderConfig
         , inputState : InputState
         }
@@ -35,6 +38,9 @@ initModel =
     , transforms = initComponents
     , inertias = initComponents
     , guns = initComponents
+    , solids = initComponents
+    , barriers = initComponents
+    , players = initComponents
     , renderConfig = { time = 0, size = ( 800, 600 ), camera = fixedArea renderUnits ( renderWidth, renderHeight ) |> moveTo ( 0, 0 ) }
     , inputState = initInputState
     }
