@@ -12,7 +12,7 @@ import QuickMath exposing (..)
 debugScene1 : WorldModel -> WorldModel
 debugScene1 world =
     (((world |> forNewEntity)
-        &=> ( transforms, { x = 0, y = 0, width = 1, height = 1 } )
+        &=> ( transforms, { x = 2, y = 3, width = 1, height = 1 } )
         &=> ( inertias, { vx = 0, vy = 0, falls = True } )
         &=> ( solids, Object )
         &=> ( players, True )
@@ -33,20 +33,20 @@ debugScene1 world =
 debugMover : Float -> WorldModel -> WorldModel
 debugMover dt ({ inputState } as world) =
     let
-        moveBy ( x, y ) a =
-            Debug.log "Moved" { a | x = a.x + x, y = a.y + y }
+        moveBy ( x, y ) ({ b } as ent) =
+            { ent | b = { b | vx = x, vy = y } }
 
         directions =
-            [ ( 'A', ( -dt, 0 ) )
-            , ( 'W', ( 0, dt ) )
-            , ( 'S', ( 0, -dt ) )
-            , ( 'D', ( dt, 0 ) )
+            [ ( 'A', ( -1, 0 ) )
+            , ( 'W', ( 0, 1 ) )
+            , ( 'S', ( 0, -1 ) )
+            , ( 'D', ( 1, 0 ) )
             ]
 
         stepDirection ( key, direction ) aWorld =
             case Dict.get (Char.toCode key) inputState.keyState of
                 Just True ->
-                    stepEntities (entities2 transforms players) (\ent -> { ent | a = moveBy direction ent.a }) aWorld
+                    stepEntities (entities3 transforms inertias players) (moveBy direction) aWorld
 
                 _ ->
                     aWorld
@@ -76,7 +76,7 @@ debugShooter dt ({ inputState, renderConfig } as world) =
                     newWorld
                     (\offset spawnPair ->
                         spawnPair
-                            &=> ( transforms, { x = a.x - 0.1, y = a.y - 0.1, width = 0.2, height = 0.2 } )
+                            &=> ( transforms, { x = a.x + a.width / 2 - 0.1, y = a.y + a.height / 2 - 0.1, width = 0.2, height = 0.2 } )
                             &=> ( solids, Object )
                             &=> ( inertias
                                 , normalizeScale 6

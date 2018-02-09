@@ -6,16 +6,16 @@ import Input.Listeners exposing (..)
 import World.Msg exposing (..)
 import World.Components exposing (..)
 import World.DebugScene exposing (debugMover, debugShooter)
-import World.Physical exposing (applyTransformInertia, applyGravity, stopSolids)
+import World.Physical exposing (applyGravity)
+import World.Collision exposing (applyVelocityWithCollisions)
 
 
 engine =
     initEngine deletor
         [ timedSystem debugMover
         , timedSystem debugShooter
-        , timedSystem applyTransformInertia
         , timedSystem applyGravity
-        , untimedSystem stopSolids
+        , timedSystem applyVelocityWithCollisions
         ]
         [ listenerMap intoInputMsg outOfInputMsg keyListener
         ]

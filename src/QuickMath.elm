@@ -9,6 +9,36 @@ type alias Vector o =
     { o | vx : Float, vy : Float }
 
 
+getX : Vector o -> Float
+getX { vx } =
+    vx
+
+
+getY : Vector o -> Float
+getY { vy } =
+    vy
+
+
+setX : Float -> Vector o -> Vector o
+setX nx vec =
+    { vec | vx = nx }
+
+
+setY : Float -> Vector o -> Vector o
+setY ny vec =
+    { vec | vy = ny }
+
+
+add : { o | vx : Float, vy : Float } -> ( Float, Float ) -> { o | vx : Float, vy : Float }
+add ({ vx, vy } as vec) ( px, py ) =
+    { vec | vx = vx + px, vy = vy + py }
+
+
+scale : Float -> Vector o -> Vector o
+scale scale ({ vx, vy } as o) =
+    { o | vx = vx * scale, vy = vy * scale }
+
+
 normalizeScale : Float -> Vector o -> Vector o
 normalizeScale scale ({ vx, vy } as o) =
     let
@@ -44,8 +74,8 @@ rotate amount ({ vx, vy } as vec) =
 collides : Rectangle o -> Rectangle o -> Bool
 collides me them =
     not
-        ((me.x - me.width / 2 > them.x + them.width / 2)
-            || (me.x + me.width / 2 < them.x - them.width / 2)
-            || (me.y - me.height / 2 > them.y + them.height / 2)
-            || (me.y + me.height / 2 < them.y - them.height / 2)
+        ((me.x > them.x + them.width)
+            || (me.x + me.width < them.x)
+            || (me.y > them.y + them.height)
+            || (me.y + me.height < them.y)
         )

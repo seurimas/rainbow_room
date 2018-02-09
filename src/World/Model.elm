@@ -2,9 +2,11 @@ module World.Model exposing (WorldModel, initModel)
 
 import Slime exposing (..)
 import World.Components exposing (..)
+import World.Level exposing (..)
 import Game.TwoD exposing (RenderConfig)
 import Game.TwoD.Camera exposing (fixedArea, Camera, moveTo)
 import Input.Listeners exposing (InputState, initInputState)
+import Color
 
 
 renderWidth =
@@ -16,7 +18,7 @@ renderHeight =
 
 
 renderUnits =
-    8 * 6
+    16 * 12
 
 
 type alias WorldModel =
@@ -29,6 +31,7 @@ type alias WorldModel =
         , players : ComponentSet Bool
         , renderConfig : RenderConfig
         , inputState : InputState
+        , tileMap : TileMap WorldTile
         }
 
 
@@ -43,4 +46,15 @@ initModel =
     , players = initComponents
     , renderConfig = { time = 0, size = ( 800, 600 ), camera = fixedArea renderUnits ( renderWidth, renderHeight ) |> moveTo ( 0, 0 ) }
     , inputState = initInputState
+    , tileMap =
+        getLevel
+            ([ ( 1, 2, Color.red )
+             , ( 1, 3, Color.red )
+             , ( 3, 3, Color.red )
+             , ( 3, 4, Color.red )
+             ]
+                ++ (List.range 1 50
+                        |> List.map (\x -> ( x, 1, Color.green ))
+                   )
+            )
     }
