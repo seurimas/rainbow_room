@@ -5,6 +5,7 @@ import World.Level exposing (..)
 import World.Model exposing (..)
 import World.Components exposing (..)
 import QuickMath exposing (..)
+import Vector2 exposing (..)
 
 
 transformLip =
@@ -13,23 +14,23 @@ transformLip =
 
 horizontalEdge transform velocity =
     if getX velocity < 0 then
-        [ { vx = transform.x + transformLip, vy = transform.y + transformLip }
-        , { vx = transform.x + transformLip, vy = transform.y + transform.height - transformLip }
+        [ ( transform.x + transformLip, transform.y + transformLip )
+        , ( transform.x + transformLip, transform.y + transform.height - transformLip )
         ]
     else
-        [ { vx = transform.x + transform.width - transformLip, vy = transform.y + transformLip }
-        , { vx = transform.x + transform.width - transformLip, vy = transform.y + transform.height - transformLip }
+        [ ( transform.x + transform.width - transformLip, transform.y + transformLip )
+        , ( transform.x + transform.width - transformLip, transform.y + transform.height - transformLip )
         ]
 
 
 verticalEdge transform velocity =
     if getY velocity < 0 then
-        [ { vx = transform.x + transformLip, vy = transform.y + transformLip }
-        , { vx = transform.x + transform.width - transformLip, vy = transform.y + transformLip }
+        [ ( transform.x + transformLip, transform.y + transformLip )
+        , ( transform.x + transform.width - transformLip, transform.y + transformLip )
         ]
     else
-        [ { vx = transform.x + transformLip, vy = transform.y + transform.height - transformLip }
-        , { vx = transform.x + transform.width - transformLip, vy = transform.y + transform.height - transformLip }
+        [ ( transform.x + transformLip, transform.y + transform.height - transformLip )
+        , ( transform.x + transform.width - transformLip, transform.y + transform.height - transformLip )
         ]
 
 

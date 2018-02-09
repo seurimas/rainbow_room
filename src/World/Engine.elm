@@ -2,20 +2,23 @@ module World.Engine exposing (..)
 
 import Slime exposing (..)
 import Slime.Engine exposing (..)
-import Input.Listeners exposing (..)
+import Input.Listeners exposing (inputSubscriptions, keyListener)
 import World.Msg exposing (..)
 import World.Components exposing (..)
-import World.DebugScene exposing (debugMover, debugShooter)
+import World.DebugScene exposing (debugShooter)
 import World.Physical exposing (applyGravity)
 import World.Collision exposing (applyVelocityWithCollisions)
+import Player.Systems exposing (cameraFollow, applyPlayerMovement, transferPlayerInput)
 
 
 engine =
     initEngine deletor
-        [ timedSystem debugMover
-        , timedSystem debugShooter
+        [ timedSystem debugShooter
+        , untimedSystem transferPlayerInput
         , timedSystem applyGravity
         , timedSystem applyVelocityWithCollisions
+        , timedSystem applyPlayerMovement
+        , timedSystem cameraFollow
         ]
         [ listenerMap intoInputMsg outOfInputMsg keyListener
         ]

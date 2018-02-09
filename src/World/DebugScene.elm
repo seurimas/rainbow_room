@@ -13,9 +13,9 @@ debugScene1 : WorldModel -> WorldModel
 debugScene1 world =
     (((world |> forNewEntity)
         &=> ( transforms, { x = 2, y = 3, width = 1, height = 1 } )
-        &=> ( inertias, { vx = 0, vy = 0, falls = True } )
+        &=> ( inertias, ( 0, 0 ) )
         &=> ( solids, Object )
-        &=> ( players, True )
+        &=> ( players, initPlayer )
         &=> ( guns, { sinceLast = 0, cooldown = 0.25, spread = 0.2, projectileCount = 8 } )
         |> Tuple.second
         |> forNewEntity
@@ -28,39 +28,6 @@ debugScene1 world =
         &=> ( transforms, { x = -1, y = -3, width = 1, height = 2 } )
         &=> ( barriers, East )
         |> Tuple.second
-
-
-debugMover : Float -> WorldModel -> WorldModel
-debugMover dt ({ inputState } as world) =
-    let
-        moveBy ( x, y ) ({ b } as ent) =
-            { ent | b = { b | vx = x, vy = y } }
-
-        directions =
-            [ ( 'A', ( -1, 0 ) )
-            , ( 'W', ( 0, 1 ) )
-            , ( 'S', ( 0, -1 ) )
-            , ( 'D', ( 1, 0 ) )
-            ]
-
-        stepDirection ( key, direction ) aWorld =
-            case Dict.get (Char.toCode key) inputState.keyState of
-                Just True ->
-                    stepEntities (entities3 transforms inertias players) (moveBy direction) aWorld
-
-                _ ->
-                    aWorld
-    in
-        List.foldl stepDirection world directions
-            |> stepEntities (entities3 transforms inertias players)
-                (\({ a, b } as ent) ->
-                    case Dict.get (Char.toCode ' ') inputState.keyState of
-                        Just True ->
-                            { ent | a = { a | x = 0, y = 0 }, b = { b | vx = 0, vy = 0 } }
-
-                        _ ->
-                            ent
-                )
 
 
 debugShooter : Float -> WorldModel -> WorldModel
@@ -80,10 +47,9 @@ debugShooter dt ({ inputState, renderConfig } as world) =
                             &=> ( solids, Object )
                             &=> ( inertias
                                 , normalizeScale 6
-                                    { vx = x - a.x
-                                    , vy = y - a.y
-                                    , falls = True
-                                    }
+                                    ( x - a.x
+                                    , y - a.y
+                                    )
                                     |> rotate (toFloat offset * b.spread / toFloat b.projectileCount)
                                 )
                     )

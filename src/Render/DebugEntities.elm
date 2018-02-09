@@ -10,6 +10,7 @@ import World.Collision exposing (..)
 import World.Level as Level
 import Lazy.List
 import QuickMath exposing (..)
+import Vector2 exposing (..)
 
 
 renderTiles : WorldModel -> List Renderable
@@ -28,13 +29,13 @@ renderTiles ({ tileMap } as world) =
             (getPosition world.renderConfig.camera)
 
         cameraVec =
-            { vx = cameraX, vy = cameraY }
+            ( cameraX, cameraY )
 
         ( cameraStart, cameraEnd ) =
             ( add cameraVec ( -cameraWidth / 2, -cameraHeight / 2 )
-                |> \{ vx, vy } -> ( floor vx, floor vy )
+                |> Vector2.map floor
             , add cameraVec ( cameraWidth / 2, cameraHeight / 2 )
-                |> \{ vx, vy } -> ( ceiling vx, ceiling vy )
+                |> Vector2.map ceiling
             )
     in
         Level.getTiles cameraStart cameraEnd tileMap
@@ -42,7 +43,7 @@ renderTiles ({ tileMap } as world) =
             |> Lazy.List.toList
 
 
-renderPicks : List (Entity2 Transform (Vector o)) -> WorldModel -> List Renderable
+renderPicks : List (Entity2 Rectangle Vector) -> WorldModel -> List Renderable
 renderPicks entities world =
     let
         renderMyPicks { a, b } =

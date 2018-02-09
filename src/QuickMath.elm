@@ -1,46 +1,18 @@
 module QuickMath exposing (..)
 
-
-type alias Rectangle o =
-    { o | x : Float, y : Float, width : Float, height : Float }
+import Vector2
 
 
-type alias Vector o =
-    { o | vx : Float, vy : Float }
+type alias Rectangle =
+    { x : Float, y : Float, width : Float, height : Float }
 
 
-getX : Vector o -> Float
-getX { vx } =
-    vx
+type alias Vector =
+    Vector2.Float2
 
 
-getY : Vector o -> Float
-getY { vy } =
-    vy
-
-
-setX : Float -> Vector o -> Vector o
-setX nx vec =
-    { vec | vx = nx }
-
-
-setY : Float -> Vector o -> Vector o
-setY ny vec =
-    { vec | vy = ny }
-
-
-add : { o | vx : Float, vy : Float } -> ( Float, Float ) -> { o | vx : Float, vy : Float }
-add ({ vx, vy } as vec) ( px, py ) =
-    { vec | vx = vx + px, vy = vy + py }
-
-
-scale : Float -> Vector o -> Vector o
-scale scale ({ vx, vy } as o) =
-    { o | vx = vx * scale, vy = vy * scale }
-
-
-normalizeScale : Float -> Vector o -> Vector o
-normalizeScale scale ({ vx, vy } as o) =
+normalizeScale : Float -> Vector -> Vector
+normalizeScale scale ( vx, vy ) =
     let
         size2 =
             vx * vx + vy * vy
@@ -49,18 +21,13 @@ normalizeScale scale ({ vx, vy } as o) =
             sqrt size2
     in
         if size2 > 0 then
-            { o | vx = scale * vx / size, vy = scale * vy / size }
+            ( scale * vx / size, scale * vy / size )
         else
-            { o | vx = 0, vy = 0 }
+            ( 0, 0 )
 
 
-normalize : Vector o -> Vector o
-normalize =
-    normalizeScale 1
-
-
-rotate : Float -> Vector o -> Vector o
-rotate amount ({ vx, vy } as vec) =
+rotate : Float -> Vector -> Vector
+rotate amount ( vx, vy ) =
     let
         cosT =
             cos amount
@@ -68,10 +35,10 @@ rotate amount ({ vx, vy } as vec) =
         sinT =
             sin amount
     in
-        { vec | vx = vx * cosT - vy * sinT, vy = vx * sinT + vy * cosT }
+        ( vx * cosT - vy * sinT, vx * sinT + vy * cosT )
 
 
-collides : Rectangle o -> Rectangle o -> Bool
+collides : Rectangle -> Rectangle -> Bool
 collides me them =
     not
         ((me.x > them.x + them.width)
@@ -79,3 +46,32 @@ collides me them =
             || (me.y > them.y + them.height)
             || (me.y + me.height < them.y)
         )
+
+
+type HDir
+    = Left
+    | Right
+
+
+sign : Float -> Float
+sign val =
+    if val < 0 then
+        -1
+    else
+        1
+
+
+rect ( x, y, width, height ) =
+    { x = x, y = y, width = width, height = height }
+
+
+pos { x, y } =
+    ( x, y )
+
+
+size { width, height } =
+    ( width, height )
+
+
+center { x, y, width, height } =
+    ( x + width / 2, y + height / 2 )

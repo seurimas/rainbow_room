@@ -1,14 +1,7 @@
 module World.Components exposing (..)
 
 import Slime exposing (componentSpec, deleteEntity, (&->), EntityDeletor)
-
-
-type alias Transform =
-    { x : Float
-    , y : Float
-    , width : Float
-    , height : Float
-    }
+import QuickMath exposing (..)
 
 
 transforms =
@@ -16,10 +9,7 @@ transforms =
 
 
 type alias Inertia =
-    { vx : Float
-    , vy : Float
-    , falls : Bool
-    }
+    Vector
 
 
 inertias =
@@ -55,6 +45,18 @@ type Solid
 
 solids =
     componentSpec .solids (\solids world -> { world | solids = solids })
+
+
+type alias PlayerState =
+    { moveLeft : Bool
+    , moveRight : Bool
+    , wantRun : Bool
+    , wantJump : Bool
+    }
+
+
+initPlayer =
+    { moveLeft = False, moveRight = False, wantRun = False, wantJump = False }
 
 
 players =

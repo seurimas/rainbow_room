@@ -14,8 +14,8 @@ type alias WorldTile =
     Color
 
 
-pickTile_ : ( Int, Int ) -> Vector o -> TileMap tile -> Maybe ( Float, Float, tile )
-pickTile_ ( tx, ty ) { vx, vy } tiles =
+pickTile_ : ( Int, Int ) -> Vector -> TileMap tile -> Maybe ( Float, Float, tile )
+pickTile_ ( tx, ty ) ( vx, vy ) tiles =
     getTile ( tx, ty ) tiles
         |> Maybe.map (\tile -> ( vx, vy, tile ))
 
@@ -28,62 +28,62 @@ roundDirection direction value =
         ceiling value - 1
 
 
-pickTiles_ : List (Maybe ( Float, Float, tile )) -> Vector o -> Vector t -> TileMap tile -> List ( Float, Float, tile )
-pickTiles_ found vec0 vecn tiles =
-    if (floor vec0.vx) == (floor vecn.vx) && (floor vec0.vy) == (floor vecn.vy) then
+pickTiles_ : List (Maybe ( Float, Float, tile )) -> Vector -> Vector -> TileMap tile -> List ( Float, Float, tile )
+pickTiles_ found ( x0, y0 ) ( xn, yn ) tiles =
+    if (floor x0) == (floor xn) && (floor y0) == (floor yn) then
         List.filterMap identity found
     else if List.length found > 100 then
         Debug.crash "Large."
     else
         let
             dx =
-                (vecn.vx - vec0.vx)
+                (xn - x0)
 
             dy =
-                (vecn.vy - vec0.vy)
+                (yn - y0)
 
             x1 =
-                roundDirection dx vec0.vx
+                roundDirection dx x0
 
             y1 =
-                roundDirection dy vec0.vy
+                roundDirection dy y0
 
             tx =
-                (toFloat x1 - vec0.vx) / dx
+                (toFloat x1 - x0) / dx
 
             ty =
-                (toFloat y1 - vec0.vy) / dy
+                (toFloat y1 - y0) / dy
         in
             if tx > 2 || ty > 2 then
                 List.filterMap identity found
             else if tx > ty then
                 let
                     collision =
-                        { vx = toFloat x1, vy = vec0.vy + (dy / dx) * tx }
+                        ( toFloat x1, y0 + (dy / dx) * tx )
 
                     tile =
                         if dx > 0 then
-                            ( x1, floor vec0.vy )
+                            ( x1, floor y0 )
                         else
-                            ( x1 - 1, floor vec0.vy )
+                            ( x1 - 1, floor y0 )
                 in
-                    pickTiles_ ((pickTile_ tile collision tiles) :: found) collision vecn tiles
+                    pickTiles_ ((pickTile_ tile collision tiles) :: found) collision ( xn, yn ) tiles
             else if ty > tx then
                 let
                     collision =
-                        { vx = vec0.vx + (dx / dy) * ty, vy = toFloat y1 }
+                        ( x0 + (dx / dy) * ty, toFloat y1 )
 
                     tile =
                         if dy > 0 then
-                            ( floor vec0.vx, y1 )
+                            ( floor x0, y1 )
                         else
-                            ( floor vec0.vx, y1 - 1 )
+                            ( floor x0, y1 - 1 )
                 in
-                    pickTiles_ ((pickTile_ tile collision tiles) :: found) collision vecn tiles
+                    pickTiles_ ((pickTile_ tile collision tiles) :: found) collision ( xn, yn ) tiles
             else
                 let
                     collision =
-                        { vx = toFloat x1, vy = toFloat y1 }
+                        ( toFloat x1, toFloat y1 )
 
                     tile =
                         ( if dx > 0 then
@@ -96,10 +96,10 @@ pickTiles_ found vec0 vecn tiles =
                             y1 - 1
                         )
                 in
-                    pickTiles_ ((pickTile_ ( x1, y1 ) collision tiles) :: found) collision vecn tiles
+                    pickTiles_ ((pickTile_ ( x1, y1 ) collision tiles) :: found) collision ( xn, yn ) tiles
 
 
-pickTiles : Vector o -> Vector o -> TileMap tile -> List ( Float, Float, tile )
+pickTiles : Vector -> Vector -> TileMap tile -> List ( Float, Float, tile )
 pickTiles start end tiles =
     pickTiles_ [] start end tiles
 

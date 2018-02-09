@@ -5,8 +5,9 @@ import World.Components exposing (..)
 import World.Level exposing (..)
 import Game.TwoD exposing (RenderConfig)
 import Game.TwoD.Camera exposing (fixedArea, Camera, moveTo)
-import Input.Listeners exposing (InputState, initInputState)
+import Input.Model exposing (InputState, initInputState)
 import Color
+import QuickMath exposing (..)
 
 
 renderWidth =
@@ -23,12 +24,12 @@ renderUnits =
 
 type alias WorldModel =
     EntitySet
-        { transforms : ComponentSet Transform
+        { transforms : ComponentSet Rectangle
         , inertias : ComponentSet Inertia
         , guns : ComponentSet Gun
         , solids : ComponentSet Solid
         , barriers : ComponentSet Barrier
-        , players : ComponentSet Bool
+        , players : ComponentSet PlayerState
         , renderConfig : RenderConfig
         , inputState : InputState
         , tileMap : TileMap WorldTile

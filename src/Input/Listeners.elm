@@ -5,6 +5,7 @@ import Dict exposing (Dict, insert)
 import Slime.Engine exposing (listener)
 import Keyboard
 import Mouse
+import Input.Model exposing (..)
 
 
 type InputMsg
@@ -14,18 +15,6 @@ type InputMsg
     | MouseDown Mouse.Position
     | MouseUp Mouse.Position
     | Noop
-
-
-type alias InputState =
-    { keyState : Dict KeyCode Bool
-    , mouseState : { x : Int, y : Int, down : Bool }
-    }
-
-
-initInputState =
-    { keyState = Dict.empty
-    , mouseState = { x = 0, y = 0, down = False }
-    }
 
 
 inputSubscriptions =
