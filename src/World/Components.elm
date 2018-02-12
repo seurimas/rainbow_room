@@ -2,6 +2,7 @@ module World.Components exposing (..)
 
 import Slime exposing (componentSpec, deleteEntity, (&->), EntityDeletor)
 import QuickMath exposing (..)
+import Color exposing (..)
 
 
 transforms =
@@ -28,25 +29,6 @@ guns =
     componentSpec .guns (\guns world -> { world | guns = guns })
 
 
-type Barrier
-    = North
-    | East
-    | South
-    | West
-
-
-barriers =
-    componentSpec .barriers (\barriers world -> { world | barriers = barriers })
-
-
-type Solid
-    = Object
-
-
-solids =
-    componentSpec .solids (\solids world -> { world | solids = solids })
-
-
 type alias PlayerState =
     { moveLeft : Bool
     , moveRight : Bool
@@ -63,10 +45,26 @@ players =
     componentSpec .players (\players world -> { world | players = players })
 
 
+type alias Paint =
+    Color
+
+
+type alias Paintable =
+    Paint
+
+
+painters =
+    componentSpec .painters (\painters world -> { world | painters = painters })
+
+
+paintables =
+    componentSpec .paintables (\paintables world -> { world | paintables = paintables })
+
+
 deletor =
     deleteEntity transforms
         &-> inertias
         &-> guns
-        &-> barriers
-        &-> solids
         &-> players
+        &-> painters
+        &-> paintables

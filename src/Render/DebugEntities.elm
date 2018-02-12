@@ -57,7 +57,7 @@ renderPicks entities world =
                 tiles =
                     horizontalSweep transform velocity world.tileMap ++ verticalSweep transform velocity world.tileMap
 
-                drawTile ( x, y, _ ) =
+                drawTile ( x, y, tx, ty, _ ) =
                     Render.shape Render.circle { color = Color.black, position = ( x, y ), size = ( 0.25, 0.25 ) }
             in
                 tiles |> List.map drawTile

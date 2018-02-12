@@ -8,7 +8,7 @@ import Vector2 exposing (..)
 
 
 gravitySize =
-    3
+    8
 
 
 applyGravity : Float -> WorldModel -> WorldModel

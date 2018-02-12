@@ -165,7 +165,7 @@ cameraFollow : Float -> WorldModel -> WorldModel
 cameraFollow delta ({ renderConfig } as world) =
     let
         cameraMove =
-            8 * delta
+            8
 
         player =
             world

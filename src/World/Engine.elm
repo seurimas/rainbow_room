@@ -9,6 +9,7 @@ import World.DebugScene exposing (debugShooter)
 import World.Physical exposing (applyGravity)
 import World.Collision exposing (applyVelocityWithCollisions)
 import Player.Systems exposing (cameraFollow, applyPlayerMovement, transferPlayerInput)
+import World.Collision.Painting exposing (paintTheTown)
 
 
 engine =
@@ -16,7 +17,7 @@ engine =
         [ timedSystem debugShooter
         , untimedSystem transferPlayerInput
         , timedSystem applyGravity
-        , timedSystem applyVelocityWithCollisions
+        , timedSystem (applyVelocityWithCollisions [ paintTheTown ])
         , timedSystem applyPlayerMovement
         , timedSystem cameraFollow
         ]

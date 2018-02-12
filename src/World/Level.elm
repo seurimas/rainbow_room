@@ -14,10 +14,10 @@ type alias WorldTile =
     Color
 
 
-pickTile_ : ( Int, Int ) -> Vector -> TileMap tile -> Maybe ( Float, Float, tile )
+pickTile_ : ( Int, Int ) -> Vector -> TileMap tile -> Maybe ( Float, Float, Int, Int, tile )
 pickTile_ ( tx, ty ) ( vx, vy ) tiles =
     getTile ( tx, ty ) tiles
-        |> Maybe.map (\tile -> ( vx, vy, tile ))
+        |> Maybe.map (\tile -> ( vx, vy, tx, ty, tile ))
 
 
 roundDirection : Float -> Float -> Int
@@ -28,7 +28,7 @@ roundDirection direction value =
         ceiling value - 1
 
 
-pickTiles_ : List (Maybe ( Float, Float, tile )) -> Vector -> Vector -> TileMap tile -> List ( Float, Float, tile )
+pickTiles_ : List (Maybe ( Float, Float, Int, Int, tile )) -> Vector -> Vector -> TileMap tile -> List ( Float, Float, Int, Int, tile )
 pickTiles_ found ( x0, y0 ) ( xn, yn ) tiles =
     if (floor x0) == (floor xn) && (floor y0) == (floor yn) then
         List.filterMap identity found
@@ -99,7 +99,7 @@ pickTiles_ found ( x0, y0 ) ( xn, yn ) tiles =
                     pickTiles_ ((pickTile_ ( x1, y1 ) collision tiles) :: found) collision ( xn, yn ) tiles
 
 
-pickTiles : Vector -> Vector -> TileMap tile -> List ( Float, Float, tile )
+pickTiles : Vector -> Vector -> TileMap tile -> List ( Float, Float, Int, Int, tile )
 pickTiles start end tiles =
     pickTiles_ [] start end tiles
 

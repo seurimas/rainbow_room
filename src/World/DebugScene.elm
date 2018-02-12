@@ -7,6 +7,7 @@ import Char
 import Dict
 import Game.TwoD.Camera exposing (viewportToGameCoordinates)
 import QuickMath exposing (..)
+import Color
 
 
 debugScene1 : WorldModel -> WorldModel
@@ -14,20 +15,11 @@ debugScene1 world =
     (((world |> forNewEntity)
         &=> ( transforms, { x = 2, y = 3, width = 1, height = 1 } )
         &=> ( inertias, ( 0, 0 ) )
-        &=> ( solids, Object )
         &=> ( players, initPlayer )
         &=> ( guns, { sinceLast = 0, cooldown = 0.25, spread = 0.2, projectileCount = 8 } )
         |> Tuple.second
-        |> forNewEntity
      )
-        &=> ( transforms, { x = -2, y = -2, width = 2, height = 1 } )
-        &=> ( barriers, North )
-        |> Tuple.second
-        |> forNewEntity
     )
-        &=> ( transforms, { x = -1, y = -3, width = 1, height = 2 } )
-        &=> ( barriers, East )
-        |> Tuple.second
 
 
 debugShooter : Float -> WorldModel -> WorldModel
@@ -44,7 +36,7 @@ debugShooter dt ({ inputState, renderConfig } as world) =
                     (\offset spawnPair ->
                         spawnPair
                             &=> ( transforms, { x = a.x + a.width / 2 - 0.1, y = a.y + a.height / 2 - 0.1, width = 0.2, height = 0.2 } )
-                            &=> ( solids, Object )
+                            &=> ( painters, Color.blue )
                             &=> ( inertias
                                 , normalizeScale 6
                                     ( x - a.x

@@ -27,9 +27,9 @@ type alias WorldModel =
         { transforms : ComponentSet Rectangle
         , inertias : ComponentSet Inertia
         , guns : ComponentSet Gun
-        , solids : ComponentSet Solid
-        , barriers : ComponentSet Barrier
         , players : ComponentSet PlayerState
+        , painters : ComponentSet Paint
+        , paintables : ComponentSet Paintable
         , renderConfig : RenderConfig
         , inputState : InputState
         , tileMap : TileMap WorldTile
@@ -42,9 +42,9 @@ initModel =
     , transforms = initComponents
     , inertias = initComponents
     , guns = initComponents
-    , solids = initComponents
-    , barriers = initComponents
     , players = initComponents
+    , painters = initComponents
+    , paintables = initComponents
     , renderConfig = { time = 0, size = ( 800, 600 ), camera = fixedArea renderUnits ( renderWidth, renderHeight ) |> moveTo ( 0, 0 ) }
     , inputState = initInputState
     , tileMap =

@@ -6,6 +6,8 @@ import World.Model exposing (..)
 import World.Components exposing (..)
 import QuickMath exposing (..)
 import Vector2 exposing (..)
+import World.Collision.Listeners exposing (CollisionListener, CollisionPoint, CollisionType(..))
+import Color exposing (Color)
 
 
 transformLip =
@@ -60,8 +62,67 @@ verticalSweep transform movement tiles =
         |> List.concat
 
 
-applyVelocityWithCollisions : Float -> WorldModel -> WorldModel
-applyVelocityWithCollisions delta world =
+bestOf_ : (CollisionPoint tile -> CollisionPoint tile -> Bool) -> CollisionPoint tile -> List (CollisionPoint tile) -> Maybe (CollisionPoint tile)
+bestOf_ compare now list =
+    case list of
+        next :: rest ->
+            if compare now next then
+                bestOf_ compare next rest
+            else
+                bestOf_ compare now rest
+
+        [] ->
+            Just now
+
+
+bestOf : (CollisionPoint tile -> CollisionPoint tile -> Bool) -> List (CollisionPoint tile) -> Maybe (CollisionPoint tile)
+bestOf compare list =
+    case list of
+        head :: rest ->
+            bestOf_ compare head rest
+
+        [] ->
+            Nothing
+
+
+leftMost : List (CollisionPoint tile) -> Maybe (CollisionPoint tile)
+leftMost list =
+    bestOf (\( nowX, _, _, _, _ ) ( nextX, _, _, _, _ ) -> (nextX < nowX)) list
+
+
+rightMost : List (CollisionPoint tile) -> Maybe (CollisionPoint tile)
+rightMost list =
+    bestOf (\( nowX, _, _, _, _ ) ( nextX, _, _, _, _ ) -> (nextX > nowX)) list
+
+
+topMost : List (CollisionPoint tile) -> Maybe (CollisionPoint tile)
+topMost list =
+    bestOf (\( _, nowY, _, _, _ ) ( _, nextY, _, _, _ ) -> (nextY < nowY)) list
+
+
+bottomMost : List (CollisionPoint tile) -> Maybe (CollisionPoint tile)
+bottomMost list =
+    bestOf (\( _, nowY, _, _, _ ) ( _, nextY, _, _, _ ) -> (nextY > nowY)) list
+
+
+applyCollisionListeners : CollisionType -> List (CollisionListener x) -> EntityID -> Float2 -> Maybe (CollisionPoint x) -> WorldModel -> WorldModel
+applyCollisionListeners collisionType collisionListeners id velocity maybeCollision world =
+    case maybeCollision of
+        Nothing ->
+            world
+
+        Just collisionPoint ->
+            case collisionListeners of
+                first :: rest ->
+                    first { location = collisionPoint, entity = id, velocity = velocity, collisionType = collisionType } world
+                        |> applyCollisionListeners collisionType rest id velocity maybeCollision
+
+                [] ->
+                    world
+
+
+applyVelocityWithCollisions : List (CollisionListener Color) -> Float -> WorldModel -> WorldModel
+applyVelocityWithCollisions collisionListeners delta world =
     let
         epsilon =
             1.0e-10
@@ -71,31 +132,23 @@ applyVelocityWithCollisions delta world =
 
         horizontalHit transform movement =
             let
-                collisionX ( x, _, _ ) =
-                    x
-
                 tileXs =
                     horizontalSweep transform movement tiles
-                        |> List.map collisionX
             in
                 if getX movement > 0 then
-                    List.minimum tileXs
+                    leftMost tileXs
                 else
-                    List.maximum tileXs
+                    rightMost tileXs
 
         verticalHit transform movement =
             let
-                collisionY ( _, y, _ ) =
-                    y
-
                 tileYs =
                     verticalSweep transform movement tiles
-                        |> List.map collisionY
             in
                 if getY movement > 0 then
-                    List.minimum tileYs
+                    bottomMost tileYs
                 else
-                    List.maximum tileYs
+                    topMost tileYs
 
         moveAndTouch ({ a, b } as e) =
             let
@@ -110,25 +163,25 @@ applyVelocityWithCollisions delta world =
 
                 moveX tform move =
                     case horizontalHit tform move of
-                        Just x ->
+                        Just ( x, y, tileX, tileY, tile ) ->
                             if getX move > 0 then
-                                ( { tform | x = x - tform.width }, True )
+                                ( { tform | x = x - tform.width }, Just ( x, y, tileX, tileY, tile ) )
                             else
-                                ( { tform | x = x }, True )
+                                ( { tform | x = x }, Just ( x, y, tileX, tileY, tile ) )
 
                         Nothing ->
-                            ( { tform | x = tform.x + getX move }, False )
+                            ( { tform | x = tform.x + getX move }, Nothing )
 
                 moveY tform move =
                     case verticalHit tform move of
-                        Just y ->
+                        Just ( x, y, tileX, tileY, tile ) ->
                             if getY move > 0 then
-                                ( { tform | y = y - tform.height }, True )
+                                ( { tform | y = y - tform.height }, Just ( x, y, tileX, tileY, tile ) )
                             else
-                                ( { tform | y = y }, True )
+                                ( { tform | y = y }, Just ( x, y, tileX, tileY, tile ) )
 
                         Nothing ->
-                            ( { tform | y = tform.y + getY move }, False )
+                            ( { tform | y = tform.y + getY move }, Nothing )
 
                 ( movedX, collisionX ) =
                     moveX transform movement
@@ -136,20 +189,22 @@ applyVelocityWithCollisions delta world =
                 ( movedY, collisionY ) =
                     moveY movedX movement
             in
-                { e
+                ( { e
                     | a = movedY
                     , b =
                         velocity
-                            |> (if collisionX then
+                            |> (if collisionX /= Nothing then
                                     setX 0
                                 else
                                     identity
                                )
-                            |> (if collisionY then
+                            |> (if collisionY /= Nothing then
                                     setY 0
                                 else
                                     identity
                                )
-                }
+                  }
+                , applyCollisionListeners Horizontal collisionListeners e.id velocity collisionX >> applyCollisionListeners Vertical collisionListeners e.id velocity collisionY
+                )
     in
-        stepEntities (entities2 transforms inertias) moveAndTouch world
+        stepEntitiesAndThen (entities2 transforms inertias) moveAndTouch world
