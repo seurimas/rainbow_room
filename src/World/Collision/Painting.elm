@@ -3,11 +3,19 @@ module World.Collision.Painting exposing (..)
 import Slime exposing (..)
 import World.Collision.Listeners exposing (..)
 import Color exposing (Color)
-import World.Level exposing (..)
+import World.Tilemap exposing (..)
 import World.Components exposing (..)
+import World.Model exposing (WorldModel)
 
 
-paintTheTown : CollisionListener Color
+setThePaint : Float -> WorldModel -> WorldModel
+setThePaint dt ({ tileMap } as world) =
+    { world
+        | tileMap = updateTiles (\location ({ timeSince } as tile) -> { tile | timeSince = timeSince + dt }) tileMap
+    }
+
+
+paintTheTown : CollisionListener WorldTile
 paintTheTown collisionEvent world =
     let
         id =
@@ -22,8 +30,8 @@ paintTheTown collisionEvent world =
         case getComponentById painters id world of
             Just aColor ->
                 case getTile ( tx, ty ) world.tileMap of
-                    Just tileColor ->
-                        if tileColor == aColor then
+                    Just tile ->
+                        if (tile.color == aColor) && (tile.timeSince > 0.25) then
                             forEntityById id world
                                 &=> ( inertias
                                     , if collisionEvent.collisionType == Horizontal then
@@ -34,7 +42,7 @@ paintTheTown collisionEvent world =
                                 |> Tuple.second
                         else
                             { world
-                                | tileMap = setTile ( tx, ty ) aColor world.tileMap
+                                | tileMap = setTile ( tx, ty ) (newTile aColor) world.tileMap
                             }
                                 |> deletor id
 

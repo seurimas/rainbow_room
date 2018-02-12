@@ -1,4 +1,4 @@
-module World.Level exposing (..)
+module World.Tilemap exposing (..)
 
 import Dict exposing (Dict)
 import Lazy.List exposing (..)
@@ -8,10 +8,6 @@ import Color exposing (Color)
 
 type alias TileMap tile =
     Dict ( Int, Int ) tile
-
-
-type alias WorldTile =
-    Color
 
 
 pickTile_ : ( Int, Int ) -> Vector -> TileMap tile -> Maybe ( Float, Float, Int, Int, tile )
@@ -145,6 +141,11 @@ setTiles newTiles tiles =
             setTile ( x, y ) t
     in
         List.foldr add tiles newTiles
+
+
+updateTiles : (( Int, Int ) -> tile -> tile) -> TileMap tile -> TileMap tile
+updateTiles update tiles =
+    Dict.map update tiles
 
 
 getLevel : List ( Int, Int, tile ) -> TileMap tile

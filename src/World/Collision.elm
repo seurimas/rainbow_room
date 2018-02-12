@@ -1,7 +1,7 @@
 module World.Collision exposing (..)
 
 import Slime exposing (..)
-import World.Level exposing (..)
+import World.Tilemap exposing (..)
 import World.Model exposing (..)
 import World.Components exposing (..)
 import QuickMath exposing (..)
@@ -121,7 +121,7 @@ applyCollisionListeners collisionType collisionListeners id velocity maybeCollis
                     world
 
 
-applyVelocityWithCollisions : List (CollisionListener Color) -> Float -> WorldModel -> WorldModel
+applyVelocityWithCollisions : List (CollisionListener WorldTile) -> Float -> WorldModel -> WorldModel
 applyVelocityWithCollisions collisionListeners delta world =
     let
         epsilon =

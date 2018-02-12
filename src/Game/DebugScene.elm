@@ -1,4 +1,4 @@
-module World.DebugScene exposing (..)
+module Game.DebugScene exposing (..)
 
 import Slime exposing (..)
 import World.Model exposing (..)

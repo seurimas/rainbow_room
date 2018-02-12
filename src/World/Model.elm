@@ -2,7 +2,7 @@ module World.Model exposing (WorldModel, initModel)
 
 import Slime exposing (..)
 import World.Components exposing (..)
-import World.Level exposing (..)
+import World.Tilemap exposing (..)
 import Game.TwoD exposing (RenderConfig)
 import Game.TwoD.Camera exposing (fixedArea, Camera, moveTo)
 import Input.Model exposing (InputState, initInputState)
@@ -49,13 +49,13 @@ initModel =
     , inputState = initInputState
     , tileMap =
         getLevel
-            ([ ( 1, 2, Color.red )
-             , ( 1, 3, Color.red )
-             , ( 3, 3, Color.red )
-             , ( 3, 4, Color.red )
+            ([ ( 1, 2, newTile Color.red )
+             , ( 1, 3, newTile Color.red )
+             , ( 3, 3, newTile Color.red )
+             , ( 3, 4, newTile Color.red )
              ]
                 ++ (List.range 1 50
-                        |> List.map (\x -> ( x, 1, Color.green ))
+                        |> List.map (\x -> ( x, 1, newTile Color.green ))
                    )
             )
     }

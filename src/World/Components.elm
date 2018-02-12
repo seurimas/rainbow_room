@@ -5,6 +5,17 @@ import QuickMath exposing (..)
 import Color exposing (..)
 
 
+type alias WorldTile =
+    { color : Color
+    , timeSince : Float
+    }
+
+
+newTile : Color -> WorldTile
+newTile color =
+    { color = color, timeSince = 0 }
+
+
 transforms =
     componentSpec .transforms (\transforms world -> { world | transforms = transforms })
 

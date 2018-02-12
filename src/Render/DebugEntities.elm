@@ -7,7 +7,7 @@ import Game.TwoD.Render as Render exposing (shape, rectangle, Renderable)
 import Game.TwoD.Camera exposing (..)
 import Color exposing (..)
 import World.Collision exposing (..)
-import World.Level as Level
+import World.Tilemap as Level
 import Lazy.List
 import QuickMath exposing (..)
 import Vector2 exposing (..)
@@ -23,7 +23,7 @@ renderTiles ({ tileMap } as world) =
             20
 
         drawTile ( x, y, tile ) =
-            Render.shape Render.rectangle { color = tile, position = ( toFloat x, toFloat y ), size = ( 1, 1 ) }
+            Render.shape Render.rectangle { color = tile.color, position = ( toFloat x, toFloat y ), size = ( 1, 1 ) }
 
         ( cameraX, cameraY ) =
             (getPosition world.renderConfig.camera)

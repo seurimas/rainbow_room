@@ -11,8 +11,8 @@ import Slime.Engine
 import World.Model exposing (WorldModel, initModel)
 import World.Msg exposing (WorldMsg)
 import Render.View exposing (view)
-import World.DebugScene exposing (debugScene1)
-import World.Engine exposing (update, subscriptions)
+import Game.DebugScene exposing (debugScene1)
+import Game.Engine exposing (update, subscriptions)
 
 
 {-| -}

@@ -3,7 +3,7 @@ module Player.Systems exposing (..)
 import World.Model exposing (..)
 import World.Components exposing (..)
 import World.Collision exposing (..)
-import World.Level as Level
+import World.Tilemap as Level
 import Slime exposing (..)
 import Char exposing (KeyCode)
 import QuickMath exposing (..)
