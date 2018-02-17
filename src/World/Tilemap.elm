@@ -29,7 +29,7 @@ pickTiles_ found ( x0, y0 ) ( xn, yn ) tiles =
     if (floor x0) == (floor xn) && (floor y0) == (floor yn) then
         List.filterMap identity found
     else if List.length found > 100 then
-        Debug.crash "Large."
+        Debug.crash (toString found)
     else
         let
             dx =

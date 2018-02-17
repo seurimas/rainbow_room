@@ -4,6 +4,10 @@ import Char exposing (KeyCode, toCode)
 import Dict exposing (Dict, insert)
 
 
+type alias Interactable o =
+    { o | inputState : InputState }
+
+
 type alias InputState =
     { keyState : Dict KeyCode Bool
     , mouseState : { x : Int, y : Int, down : Bool }

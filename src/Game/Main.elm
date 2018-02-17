@@ -1,4 +1,4 @@
-module Main exposing (main)
+module Game.Main exposing (main)
 
 {-| Program entrance.
 

@@ -21,7 +21,7 @@ inputSubscriptions =
     [ Keyboard.downs KeyDown, Keyboard.ups KeyUp, Mouse.moves MouseAt, Mouse.downs MouseDown, Mouse.ups MouseUp ]
 
 
-trackKeys : InputMsg -> { o | inputState : InputState } -> { o | inputState : InputState }
+trackKeys : InputMsg -> Interactable o -> Interactable o
 trackKeys msg ({ inputState } as world) =
     case msg of
         KeyDown key ->

@@ -5,7 +5,7 @@ import World.Components exposing (..)
 import World.Tilemap exposing (..)
 import Game.TwoD exposing (RenderConfig)
 import Game.TwoD.Camera exposing (fixedArea, Camera, moveTo)
-import Input.Model exposing (InputState, initInputState)
+import Input.Model exposing (Interactable, InputState, initInputState)
 import Color
 import QuickMath exposing (..)
 
@@ -23,17 +23,18 @@ renderUnits =
 
 
 type alias WorldModel =
-    EntitySet
-        { transforms : ComponentSet Rectangle
-        , inertias : ComponentSet Inertia
-        , guns : ComponentSet Gun
-        , players : ComponentSet PlayerState
-        , painters : ComponentSet Paint
-        , paintables : ComponentSet Paintable
-        , renderConfig : RenderConfig
-        , inputState : InputState
-        , tileMap : TileMap WorldTile
-        }
+    Interactable
+        (EntitySet
+            { transforms : ComponentSet Rectangle
+            , inertias : ComponentSet Inertia
+            , guns : ComponentSet Gun
+            , players : ComponentSet PlayerState
+            , painters : ComponentSet Paint
+            , paintables : ComponentSet Paintable
+            , renderConfig : RenderConfig
+            , tileMap : TileMap WorldTile
+            }
+        )
 
 
 initModel : WorldModel
@@ -47,15 +48,5 @@ initModel =
     , paintables = initComponents
     , renderConfig = { time = 0, size = ( 800, 600 ), camera = fixedArea renderUnits ( renderWidth, renderHeight ) |> moveTo ( 0, 0 ) }
     , inputState = initInputState
-    , tileMap =
-        getLevel
-            ([ ( 1, 2, newTile Color.red )
-             , ( 1, 3, newTile Color.red )
-             , ( 3, 3, newTile Color.red )
-             , ( 3, 4, newTile Color.red )
-             ]
-                ++ (List.range 1 50
-                        |> List.map (\x -> ( x, 1, newTile Color.green ))
-                   )
-            )
+    , tileMap = getLevel []
     }

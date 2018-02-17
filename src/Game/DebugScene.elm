@@ -8,6 +8,7 @@ import Dict
 import Game.TwoD.Camera exposing (viewportToGameCoordinates)
 import QuickMath exposing (..)
 import Color
+import World.Tilemap exposing (..)
 
 
 debugScene1 : WorldModel -> WorldModel
@@ -20,6 +21,20 @@ debugScene1 world =
         |> Tuple.second
      )
     )
+        |> \w ->
+            { w
+                | tileMap =
+                    getLevel
+                        ([ ( 1, 2, newTile Color.red )
+                         , ( 1, 3, newTile Color.red )
+                         , ( 3, 3, newTile Color.red )
+                         , ( 3, 4, newTile Color.red )
+                         ]
+                            ++ (List.range 1 50
+                                    |> List.map (\x -> ( x, 1, newTile Color.green ))
+                               )
+                        )
+            }
 
 
 debugShooter : Float -> WorldModel -> WorldModel

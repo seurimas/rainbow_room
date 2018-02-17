@@ -1,4 +1,4 @@
-module Render.DebugEntities exposing (debugs)
+module Render.DebugEntities exposing (..)
 
 import World.Components exposing (..)
 import World.Model exposing (WorldModel)
@@ -13,8 +13,37 @@ import QuickMath exposing (..)
 import Vector2 exposing (..)
 
 
+renderGrid : WorldModel -> List Renderable
+renderGrid ({ renderConfig, tileMap } as world) =
+    let
+        ( cameraWidth, cameraHeight ) =
+            getViewSize (Vector2.map toFloat renderConfig.size) renderConfig.camera
+
+        ( cameraCenterX, cameraCenterY ) =
+            getPosition renderConfig.camera
+
+        cameraStartX =
+            cameraCenterX - cameraWidth / 2
+
+        cameraEndX =
+            cameraCenterX + cameraWidth / 2
+
+        cameraStartY =
+            cameraCenterY - cameraHeight / 2
+
+        cameraEndY =
+            cameraCenterY + cameraHeight / 2
+    in
+        (List.range (floor cameraStartX) (ceiling cameraEndX)
+            |> List.map (\x -> shape rectangle { color = Color.gray, position = ( toFloat x, cameraStartY ), size = ( 0.1, cameraHeight ) })
+        )
+            ++ (List.range (floor cameraStartY) (ceiling cameraEndY)
+                    |> List.map (\y -> shape rectangle { color = Color.gray, position = ( cameraStartX, toFloat y ), size = ( cameraWidth, 0.1 ) })
+               )
+
+
 renderTiles : WorldModel -> List Renderable
-renderTiles ({ tileMap } as world) =
+renderTiles ({ renderConfig, tileMap } as world) =
     let
         cameraWidth =
             20
@@ -26,7 +55,7 @@ renderTiles ({ tileMap } as world) =
             Render.shape Render.rectangle { color = tile.color, position = ( toFloat x, toFloat y ), size = ( 1, 1 ) }
 
         ( cameraX, cameraY ) =
-            (getPosition world.renderConfig.camera)
+            (getPosition renderConfig.camera)
 
         cameraVec =
             ( cameraX, cameraY )
@@ -67,7 +96,7 @@ renderPicks entities world =
 
 debugLevel : WorldModel -> List Renderable
 debugLevel world =
-    (renderTiles world)
+    (renderTiles world) ++ (renderGrid world)
 
 
 debugTransforms : WorldModel -> List Renderable
