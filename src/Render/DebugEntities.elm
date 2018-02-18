@@ -5,67 +5,39 @@ import World.Model exposing (WorldModel)
 import Slime exposing (..)
 import Game.TwoD.Render as Render exposing (shape, rectangle, Renderable)
 import Game.TwoD.Camera exposing (..)
+import Game.TwoD exposing (RenderConfig)
 import Color exposing (..)
 import World.Collision exposing (..)
 import World.Tilemap as Level
 import Lazy.List
 import QuickMath exposing (..)
 import Vector2 exposing (..)
+import Render.Utils exposing (getCameraViewport)
 
 
-renderGrid : WorldModel -> List Renderable
+renderGrid : { o | renderConfig : RenderConfig, tileMap : Level.TileMap WorldTile } -> List Renderable
 renderGrid ({ renderConfig, tileMap } as world) =
     let
-        ( cameraWidth, cameraHeight ) =
-            getViewSize (Vector2.map toFloat renderConfig.size) renderConfig.camera
-
-        ( cameraCenterX, cameraCenterY ) =
-            getPosition renderConfig.camera
-
-        cameraStartX =
-            cameraCenterX - cameraWidth / 2
-
-        cameraEndX =
-            cameraCenterX + cameraWidth / 2
-
-        cameraStartY =
-            cameraCenterY - cameraHeight / 2
-
-        cameraEndY =
-            cameraCenterY + cameraHeight / 2
+        ( ( cameraStartX, cameraStartY ), ( cameraEndX, cameraEndY ) ) =
+            getCameraViewport world
     in
         (List.range (floor cameraStartX) (ceiling cameraEndX)
-            |> List.map (\x -> shape rectangle { color = Color.gray, position = ( toFloat x, cameraStartY ), size = ( 0.1, cameraHeight ) })
+            |> List.map (\x -> shape rectangle { color = Color.gray, position = ( toFloat x, cameraStartY ), size = ( 0.1, cameraEndY - cameraStartY ) })
         )
             ++ (List.range (floor cameraStartY) (ceiling cameraEndY)
-                    |> List.map (\y -> shape rectangle { color = Color.gray, position = ( cameraStartX, toFloat y ), size = ( cameraWidth, 0.1 ) })
+                    |> List.map (\y -> shape rectangle { color = Color.gray, position = ( cameraStartX, toFloat y ), size = ( cameraEndX - cameraStartX, 0.1 ) })
                )
 
 
-renderTiles : WorldModel -> List Renderable
+renderTiles : { o | renderConfig : RenderConfig, tileMap : Level.TileMap WorldTile } -> List Renderable
 renderTiles ({ renderConfig, tileMap } as world) =
     let
-        cameraWidth =
-            20
-
-        cameraHeight =
-            20
-
         drawTile ( x, y, tile ) =
             Render.shape Render.rectangle { color = tile.color, position = ( toFloat x, toFloat y ), size = ( 1, 1 ) }
 
-        ( cameraX, cameraY ) =
-            (getPosition renderConfig.camera)
-
-        cameraVec =
-            ( cameraX, cameraY )
-
         ( cameraStart, cameraEnd ) =
-            ( add cameraVec ( -cameraWidth / 2, -cameraHeight / 2 )
-                |> Vector2.map floor
-            , add cameraVec ( cameraWidth / 2, cameraHeight / 2 )
-                |> Vector2.map ceiling
-            )
+            getCameraViewport world
+                |> Vector2.map (\vec -> Vector2.map floor vec)
     in
         Level.getTiles cameraStart cameraEnd tileMap
             |> Lazy.List.map (\tile -> (drawTile tile))

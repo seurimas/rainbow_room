@@ -8,14 +8,14 @@ module Editor.Main exposing (main)
 
 import Html exposing (..)
 import Slime.Engine
-import World.Model exposing (WorldModel, initModel)
+import Editor.Model exposing (EditorModel, initModel)
 import Input.Listeners exposing (InputMsg)
 import Editor.Render exposing (view)
 import Editor.Engine exposing (update, subscriptions)
 
 
 {-| -}
-main : Program Never WorldModel (Slime.Engine.Message InputMsg)
+main : Program Never EditorModel (Slime.Engine.Message InputMsg)
 main =
     Html.program
         { init = ( initModel, Cmd.none )
