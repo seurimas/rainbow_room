@@ -3,12 +3,16 @@ module Editor.Engine exposing (..)
 import Slime exposing (..)
 import Slime.Engine exposing (..)
 import Input.Listeners exposing (inputSubscriptions, keyListener)
-import World.Components exposing (..)
+import Editor.Systems exposing (..)
+import UI.Systems exposing (watchState)
 
 
 engine =
     initEngine (\id world -> world)
-        []
+        [ untimedSystem (watchState determineUiItems)
+        , untimedSystem selectTile
+        , untimedSystem placeTile
+        ]
         [ keyListener
         ]
 

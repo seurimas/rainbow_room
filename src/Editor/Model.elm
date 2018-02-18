@@ -1,4 +1,4 @@
-module Editor.Model exposing (EditorModel, initModel)
+module Editor.Model exposing (..)
 
 import Slime exposing (..)
 import World.Components exposing (..)
@@ -6,6 +6,7 @@ import World.Tilemap exposing (..)
 import Game.TwoD exposing (RenderConfig)
 import Game.TwoD.Camera exposing (fixedArea, Camera, moveTo)
 import Input.Model exposing (Interactable, InputState, initInputState)
+import UI.Model exposing (Interfacable, initInterfaceState)
 import Color
 import QuickMath exposing (..)
 
@@ -22,23 +23,37 @@ renderUnits =
     16 * 12
 
 
+type InterfaceZone
+    = Tiles
+    | LevelEditor
+
+
 type alias EditorModel =
-    Interactable
-        (EntitySet
-            { renderConfig : RenderConfig
-            , uiRenderConfig : RenderConfig
-            , tileMap : TileMap WorldTile
-            , selection : Color.Color
-            }
+    Interfacable InterfaceZone
+        (Interactable
+            (EntitySet
+                { renderConfig : RenderConfig
+                , tileMap : TileMap Color.Color
+                , selection : Color.Color
+                , tiles : List Color.Color
+                }
+            )
         )
 
 
 initModel : EditorModel
 initModel =
     { idSource = initIdSource
-    , renderConfig = { time = 0, size = ( 800, 600 ), camera = fixedArea renderUnits ( renderWidth, renderHeight ) |> moveTo ( 0, 0 ) }
-    , uiRenderConfig = { time = 0, size = ( 800, 600 ), camera = fixedArea renderUnits ( 800, 600 ) |> moveTo ( 400, 300 ) }
+    , renderConfig =
+        { time = 0
+        , size = ( 800, 600 )
+        , camera =
+            fixedArea renderUnits ( renderWidth, renderHeight )
+                |> moveTo ( 9, 7 )
+        }
     , inputState = initInputState
+    , interfaceState = initInterfaceState
     , tileMap = getLevel []
     , selection = Color.blue
+    , tiles = [ Color.blue, Color.red, Color.green, Color.black, Color.white ]
     }

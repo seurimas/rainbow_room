@@ -47,3 +47,11 @@ uiSize { renderConfig } ( width, height ) =
             renderConfig.size
     in
         ( width / (toFloat viewWidth) * gameWidth, height / (toFloat viewHeight) * gameHeight )
+
+
+uiElement : { o | renderConfig : RenderConfig } -> { e | size : Vector2.Float2, position : Vector2.Float2 } -> { e | size : Vector2.Float2, position : Vector2.Float2 }
+uiElement model element =
+    { element
+        | size = element.size |> uiSize model
+        , position = element.position |> uiCoordinates model
+    }

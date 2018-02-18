@@ -15,8 +15,8 @@ import Vector2 exposing (..)
 import Render.Utils exposing (getCameraViewport)
 
 
-renderGrid : { o | renderConfig : RenderConfig, tileMap : Level.TileMap WorldTile } -> List Renderable
-renderGrid ({ renderConfig, tileMap } as world) =
+renderGrid : { o | renderConfig : RenderConfig } -> List Renderable
+renderGrid ({ renderConfig } as world) =
     let
         ( ( cameraStartX, cameraStartY ), ( cameraEndX, cameraEndY ) ) =
             getCameraViewport world
@@ -29,19 +29,27 @@ renderGrid ({ renderConfig, tileMap } as world) =
                )
 
 
-renderTiles : { o | renderConfig : RenderConfig, tileMap : Level.TileMap WorldTile } -> List Renderable
-renderTiles ({ renderConfig, tileMap } as world) =
+renderTiles : RenderConfig -> Lazy.List.LazyList ( Int, Int, Color ) -> List Renderable
+renderTiles renderConfig tiles =
     let
         drawTile ( x, y, tile ) =
-            Render.shape Render.rectangle { color = tile.color, position = ( toFloat x, toFloat y ), size = ( 1, 1 ) }
+            Render.shape Render.rectangle { color = tile, position = ( toFloat x, toFloat y ), size = ( 1, 1 ) }
+    in
+        tiles
+            |> Lazy.List.map (\tile -> (drawTile tile))
+            |> Lazy.List.toList
 
+
+renderWorldTiles : { o | renderConfig : RenderConfig, tileMap : Level.TileMap WorldTile } -> List Renderable
+renderWorldTiles ({ renderConfig, tileMap } as world) =
+    let
         ( cameraStart, cameraEnd ) =
             getCameraViewport world
                 |> Vector2.map (\vec -> Vector2.map floor vec)
     in
         Level.getTiles cameraStart cameraEnd tileMap
-            |> Lazy.List.map (\tile -> (drawTile tile))
-            |> Lazy.List.toList
+            |> Lazy.List.map (\( x, y, worldTile ) -> ( x, y, worldTile.color ))
+            |> renderTiles renderConfig
 
 
 renderPicks : List (Entity2 Rectangle Vector) -> WorldModel -> List Renderable
@@ -68,7 +76,7 @@ renderPicks entities world =
 
 debugLevel : WorldModel -> List Renderable
 debugLevel world =
-    (renderTiles world) ++ (renderGrid world)
+    (renderWorldTiles world) ++ (renderGrid world)
 
 
 debugTransforms : WorldModel -> List Renderable
