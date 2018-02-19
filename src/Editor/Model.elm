@@ -10,6 +10,9 @@ import UI.Model exposing (Interfacable, initInterfaceState)
 import Color
 import QuickMath exposing (..)
 import Level.Model exposing (..)
+import Navigation exposing (Location)
+import Json.Decode as Decode
+import Level.Json exposing (locationTileMap)
 
 
 renderWidth =
@@ -27,6 +30,7 @@ renderUnits =
 type InterfaceZone
     = Tiles
     | LevelEditor
+    | LevelLink
 
 
 type alias EditorModel =
@@ -35,6 +39,7 @@ type alias EditorModel =
             (EntitySet
                 { renderConfig : RenderConfig
                 , tileMap : TileMap LevelTile
+                , trackedLevel : TileMap LevelTile
                 , selection : LevelTile
                 , tiles : List LevelTile
                 }
@@ -42,8 +47,8 @@ type alias EditorModel =
         )
 
 
-initModel : EditorModel
-initModel =
+initModel : Location -> EditorModel
+initModel location =
     { idSource = initIdSource
     , renderConfig =
         { time = 0
@@ -54,7 +59,8 @@ initModel =
         }
     , inputState = initInputState
     , interfaceState = initInterfaceState
-    , tileMap = getLevel []
+    , tileMap = locationTileMap location
+    , trackedLevel = getLevel []
     , selection = Solid Color.blue
     , tiles =
         [ Solid Color.blue

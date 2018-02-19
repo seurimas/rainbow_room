@@ -12,6 +12,8 @@ engine =
         [ untimedSystem (watchState determineUiItems)
         , untimedSystem selectTile
         , untimedSystem placeTile
+        , systemWith { timing = untimed, options = cmds } trackLevel
+        , systemWith { timing = untimed, options = cmds } enterLevel
         ]
         [ keyListener
         ]

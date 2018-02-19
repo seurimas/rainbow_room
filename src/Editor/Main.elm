@@ -6,8 +6,8 @@ module Editor.Main exposing (main)
 
 -}
 
-import Html exposing (..)
-import Slime.Engine
+import Navigation exposing (program)
+import Slime.Engine exposing (noop)
 import Editor.Model exposing (EditorModel, initModel)
 import Input.Listeners exposing (InputMsg)
 import Editor.Render exposing (view)
@@ -17,8 +17,8 @@ import Editor.Engine exposing (update, subscriptions)
 {-| -}
 main : Program Never EditorModel (Slime.Engine.Message InputMsg)
 main =
-    Html.program
-        { init = ( initModel, Cmd.none )
+    program (\_ -> noop)
+        { init = (\location -> ( initModel location, Cmd.none ))
         , update = update
         , subscriptions = subscriptions
         , view = view

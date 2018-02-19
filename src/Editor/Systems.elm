@@ -6,12 +6,19 @@ import Color
 import Input.Utils exposing (mouseGameCoordinates)
 import World.Tilemap exposing (setTile)
 import Level.Model exposing (LevelTile)
+import Navigation exposing (modifyUrl)
+import Level.Json exposing (levelEncode)
+import Input.Listeners exposing (InputMsg)
+import Json.Encode
 
 
 determineUiItems : EditorModel -> ( Int, Int ) -> Maybe InterfaceZone
-determineUiItems _ ( _, y ) =
+determineUiItems _ ( x, y ) =
     if y < 32 then
-        Just Tiles
+        if x > 800 - 32 then
+            Just LevelLink
+        else
+            Just Tiles
     else
         Just LevelEditor
 
@@ -62,3 +69,23 @@ placeTile ({ interfaceState, inputState, selection } as world) =
 
             _ ->
                 world
+
+
+trackLevel : EditorModel -> ( EditorModel, Cmd InputMsg )
+trackLevel ({ trackedLevel, tileMap } as world) =
+    { world | trackedLevel = tileMap }
+        ! (if trackedLevel == tileMap then
+            []
+           else
+            [ modifyUrl ("#" ++ Json.Encode.encode 0 (levelEncode tileMap)) ]
+          )
+
+
+enterLevel : EditorModel -> ( EditorModel, Cmd InputMsg )
+enterLevel ({ interfaceState, tileMap } as world) =
+    case interfaceState of
+        Down LevelLink _ ->
+            world ! [ Navigation.load ("../Game/Main.elm#" ++ Json.Encode.encode 0 (levelEncode tileMap)) ]
+
+        _ ->
+            world ! []

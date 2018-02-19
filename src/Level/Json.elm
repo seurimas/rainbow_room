@@ -7,6 +7,7 @@ import World.Tilemap exposing (..)
 import Dict
 import Color exposing (..)
 import Array
+import Navigation exposing (Location)
 
 
 tileEncode : LevelTile -> Encode.Value
@@ -18,8 +19,7 @@ tileEncode tile =
                     toRgb color
             in
                 Encode.list
-                    [ Encode.string "color"
-                    , Encode.int red
+                    [ Encode.int red
                     , Encode.int green
                     , Encode.int blue
                     ]
@@ -34,44 +34,30 @@ tileDecode : Decode.Decoder LevelTile
 tileDecode =
     let
         solidDecode =
-            Decode.index 0 Decode.string
+            Decode.succeed (Color.blue)
+
+        solidDecode2 =
+            Decode.list Decode.int
                 |> Decode.andThen
-                    (\string ->
-                        if string == "solid" then
-                            Decode.index 1 Decode.int
-                                |> Decode.andThen
-                                    (\red ->
-                                        Decode.index 2 Decode.int
-                                            |> Decode.andThen
-                                                (\green ->
-                                                    Decode.index 3 Decode.int
-                                                        |> Decode.andThen
-                                                            (\blue ->
-                                                                Decode.succeed (Color.rgb red green blue)
-                                                            )
-                                                )
-                                    )
-                        else
-                            Decode.fail "Not a solid"
+                    (\solid ->
+                        case solid of
+                            [ red, green, blue ] ->
+                                Decode.succeed (Color.rgb red green blue)
+
+                            _ ->
+                                Decode.fail "Not a solid"
                     )
 
         itemDecode =
-            Decode.index 0 Decode.string
+            Decode.list Decode.string
                 |> Decode.andThen
-                    (\string ->
-                        if string == "item" then
-                            Decode.index 1 Decode.string
-                                |> Decode.andThen
-                                    (\itemType ->
-                                        case itemType of
-                                            "Spawn" ->
-                                                Decode.succeed (Item Spawn)
+                    (\item ->
+                        case item of
+                            [ "item", "Spawn" ] ->
+                                Decode.succeed (Item Spawn)
 
-                                            _ ->
-                                                Decode.fail "Not a valid item"
-                                    )
-                        else
-                            Decode.fail "Not an item"
+                            _ ->
+                                Decode.fail "Not an item"
                     )
     in
         Decode.oneOf
@@ -103,3 +89,21 @@ levelDecode =
                 )
         )
         |> Decode.map getLevel
+
+
+locationTileMap : Location -> TileMap LevelTile
+locationTileMap location =
+    case location.hash of
+        "" ->
+            getLevel []
+
+        hash ->
+            Decode.decodeString levelDecode (hash |> String.dropLeft 1)
+                |> (\result ->
+                        case result of
+                            Ok tileMap ->
+                                tileMap
+
+                            Err error ->
+                                Debug.crash error
+                   )
