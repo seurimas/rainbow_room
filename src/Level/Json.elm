@@ -34,9 +34,6 @@ tileDecode : Decode.Decoder LevelTile
 tileDecode =
     let
         solidDecode =
-            Decode.succeed (Color.blue)
-
-        solidDecode2 =
             Decode.list Decode.int
                 |> Decode.andThen
                     (\solid ->
@@ -53,7 +50,7 @@ tileDecode =
                 |> Decode.andThen
                     (\item ->
                         case item of
-                            [ "item", "Spawn" ] ->
+                            [ "item", "spawn" ] ->
                                 Decode.succeed (Item Spawn)
 
                             _ ->
@@ -98,7 +95,7 @@ locationTileMap location =
             getLevel []
 
         hash ->
-            Decode.decodeString levelDecode (hash |> String.dropLeft 1)
+            Decode.decodeString levelDecode (hash |> String.split "%22" |> String.join "\"" |> String.dropLeft 1)
                 |> (\result ->
                         case result of
                             Ok tileMap ->
