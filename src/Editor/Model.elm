@@ -9,6 +9,7 @@ import Input.Model exposing (Interactable, InputState, initInputState)
 import UI.Model exposing (Interfacable, initInterfaceState)
 import Color
 import QuickMath exposing (..)
+import Level.Model exposing (..)
 
 
 renderWidth =
@@ -33,9 +34,9 @@ type alias EditorModel =
         (Interactable
             (EntitySet
                 { renderConfig : RenderConfig
-                , tileMap : TileMap Color.Color
-                , selection : Color.Color
-                , tiles : List Color.Color
+                , tileMap : TileMap LevelTile
+                , selection : LevelTile
+                , tiles : List LevelTile
                 }
             )
         )
@@ -54,6 +55,12 @@ initModel =
     , inputState = initInputState
     , interfaceState = initInterfaceState
     , tileMap = getLevel []
-    , selection = Color.blue
-    , tiles = [ Color.blue, Color.red, Color.green, Color.black, Color.white ]
+    , selection = Solid Color.blue
+    , tiles =
+        [ Solid Color.blue
+        , Solid Color.red
+        , Solid Color.green
+        , Solid Color.black
+        , Item Spawn
+        ]
     }

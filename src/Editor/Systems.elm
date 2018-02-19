@@ -5,6 +5,7 @@ import Editor.Model exposing (..)
 import Color
 import Input.Utils exposing (mouseGameCoordinates)
 import World.Tilemap exposing (setTile)
+import Level.Model exposing (LevelTile)
 
 
 determineUiItems : EditorModel -> ( Int, Int ) -> Maybe InterfaceZone
@@ -15,7 +16,7 @@ determineUiItems _ ( _, y ) =
         Just LevelEditor
 
 
-determineSelectable : EditorModel -> ( Int, Int ) -> Maybe Color.Color
+determineSelectable : EditorModel -> ( Int, Int ) -> Maybe LevelTile
 determineSelectable model ( x, y ) =
     if y > 32 then
         Nothing

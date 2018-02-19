@@ -7,29 +7,51 @@ import Render.DebugEntities exposing (renderTiles, renderGrid)
 import Game.TwoD.Render as Render exposing (shape, rectangle, Renderable)
 import Render.Utils exposing (..)
 import World.Tilemap as Level
+import Level.Model exposing (..)
 import Lazy.List
 import Vector2
 import Color
 import Game.TwoD exposing (..)
 
 
+renderLevelTile : LevelTile -> ( Float, Float ) -> ( Float, Float ) -> Renderable
+renderLevelTile tile position size =
+    case tile of
+        Solid color ->
+            Render.shape Render.rectangle { color = color, position = position, size = size }
+
+        Item Spawn ->
+            Render.shape Render.circle { color = Color.blue, position = position, size = size }
+
+
 renderSelection : EditorModel -> List Renderable
 renderSelection model =
-    [ shape rectangle (uiElement model { color = model.selection, position = ( 0, 32 ), size = ( 32, 32 ) })
+    [ renderLevelTile model.selection (uiCoordinates model ( 0, 32 )) (uiSize model ( 32, 32 ))
     ]
 
 
 renderSelectables : EditorModel -> List Renderable
 renderSelectables model =
     let
-        drawSelectable idx color =
-            shape rectangle (uiElement model { color = color, position = ( 32 + 32 * toFloat idx, 32 ), size = ( 32, 32 ) })
+        drawSelectable idx tile =
+            renderLevelTile tile (uiCoordinates model ( 32 + 32 * toFloat idx, 32 )) (uiSize model ( 32, 32 ))
     in
         model.tiles
             |> List.indexedMap drawSelectable
 
 
-renderLevel : { o | renderConfig : RenderConfig, tileMap : Level.TileMap Color.Color } -> List Renderable
+renderLevelTiles : RenderConfig -> Lazy.List.LazyList ( Int, Int, LevelTile ) -> List Renderable
+renderLevelTiles renderConfig tiles =
+    let
+        drawTile ( x, y, tile ) =
+            renderLevelTile tile ( toFloat x, toFloat y ) ( 1, 1 )
+    in
+        tiles
+            |> Lazy.List.map (\tile -> (drawTile tile))
+            |> Lazy.List.toList
+
+
+renderLevel : { o | renderConfig : RenderConfig, tileMap : Level.TileMap LevelTile } -> List Renderable
 renderLevel ({ renderConfig, tileMap } as world) =
     let
         ( cameraStart, cameraEnd ) =
@@ -37,7 +59,7 @@ renderLevel ({ renderConfig, tileMap } as world) =
                 |> Vector2.map (\vec -> Vector2.map floor vec)
     in
         Level.getTiles cameraStart cameraEnd tileMap
-            |> renderTiles renderConfig
+            |> renderLevelTiles renderConfig
 
 
 view : EditorModel -> Html x
