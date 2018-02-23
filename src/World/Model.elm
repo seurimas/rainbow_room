@@ -33,6 +33,9 @@ type alias WorldModel =
             , paintables : ComponentSet Paintable
             , bossSpawns : ComponentSet BossSpawn
             , drippers : ComponentSet Dripper
+            , drops : ComponentSet Drop
+            , blobs : ComponentSet Blob
+            , bosses : ComponentSet Boss
             , renderConfig : RenderConfig
             , uiRenderConfig : RenderConfig
             , tileMap : TileMap WorldTile
@@ -51,6 +54,9 @@ initModel =
     , paintables = initComponents
     , drippers = initComponents
     , bossSpawns = initComponents
+    , drops = initComponents
+    , blobs = initComponents
+    , bosses = initComponents
     , renderConfig = { time = 0, size = ( 800, 600 ), camera = fixedArea renderUnits ( renderWidth, renderHeight ) |> moveTo ( 0, 0 ) }
     , uiRenderConfig = { time = 0, size = ( 800, 600 ), camera = fixedArea renderUnits ( 800, 600 ) |> moveTo ( 400, 300 ) }
     , inputState = initInputState

@@ -45,7 +45,7 @@ renderWorldTiles ({ renderConfig, tileMap } as world) =
     let
         ( cameraStart, cameraEnd ) =
             getCameraViewport world
-                |> Vector2.map (\vec -> Vector2.map floor vec)
+                |> Vector2.map (\vec -> Vector2.map (floor >> (+) -1) vec)
     in
         Level.getTiles cameraStart cameraEnd tileMap
             |> Lazy.List.map (\( x, y, worldTile ) -> ( x, y, worldTile.color ))
@@ -81,10 +81,27 @@ debugLevel world =
 
 debugTransforms : WorldModel -> List Renderable
 debugTransforms world =
-    world
-        &. (entities transforms)
-        |> List.map .a
-        |> List.map (\{ x, y, width, height } -> shape rectangle { color = black, position = ( x, y ), size = ( width, height ) })
+    let
+        renderEntity ({ a, id } as ent) =
+            let
+                { x, y, width, height } =
+                    a
+            in
+                case getComponentById drippers id world of
+                    Just { progress, cooldown } ->
+                        shape Render.ring { color = red, position = ( x, y ), size = ( width * (progress / cooldown), height * (progress / cooldown) ) }
+
+                    Nothing ->
+                        case getComponentById blobs id world of
+                            Just _ ->
+                                shape rectangle { color = red, position = ( x, y ), size = ( width, height ) }
+
+                            Nothing ->
+                                shape rectangle { color = black, position = ( x, y ), size = ( width, height ) }
+    in
+        world
+            &. (entities transforms)
+            |> List.map renderEntity
 
 
 debugs : WorldModel -> List Renderable

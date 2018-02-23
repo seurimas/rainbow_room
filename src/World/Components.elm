@@ -90,12 +90,36 @@ initDripper paint =
     }
 
 
+type alias Drop =
+    {}
+
+
+drops =
+    componentSpec .drops (\drops world -> { world | drops = drops })
+
+
+type alias Blob =
+    {}
+
+
+blobs =
+    componentSpec .blobs (\blobs world -> { world | blobs = blobs })
+
+
 type alias BossSpawn =
     {}
 
 
 bossSpawns =
     componentSpec .bossSpawns (\bossSpawns world -> { world | bossSpawns = bossSpawns })
+
+
+type alias Boss =
+    {}
+
+
+bosses =
+    componentSpec .bosses (\bosses world -> { world | bosses = bosses })
 
 
 deletor =
