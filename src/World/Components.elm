@@ -72,6 +72,32 @@ paintables =
     componentSpec .paintables (\paintables world -> { world | paintables = paintables })
 
 
+type alias Dripper =
+    { progress : Float
+    , cooldown : Float
+    , paint : Paint
+    }
+
+
+drippers =
+    componentSpec .drippers (\drippers world -> { world | drippers = drippers })
+
+
+initDripper paint =
+    { progress = 0
+    , cooldown = 8
+    , paint = paint
+    }
+
+
+type alias BossSpawn =
+    {}
+
+
+bossSpawns =
+    componentSpec .bossSpawns (\bossSpawns world -> { world | bossSpawns = bossSpawns })
+
+
 deletor =
     deleteEntity transforms
         &-> inertias

@@ -134,6 +134,11 @@ setTile =
     Dict.insert
 
 
+unsetTile : ( Int, Int ) -> TileMap tile -> TileMap tile
+unsetTile =
+    Dict.remove
+
+
 setTiles : List ( Int, Int, tile ) -> TileMap tile -> TileMap tile
 setTiles newTiles tiles =
     let

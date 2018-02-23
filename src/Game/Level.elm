@@ -6,6 +6,7 @@ import World.Components exposing (..)
 import Navigation exposing (Location)
 import Level.Json exposing (locationTileMap)
 import Dict
+import Color
 import Level.Model exposing (..)
 
 
@@ -42,12 +43,55 @@ loadLevel location worldModel =
                                 Nothing
                     )
 
-        spawn ( x, y ) world =
+        dripperLocs =
+            levelMap
+                |> Dict.toList
+                |> List.filterMap
+                    (\( xy, levelTile ) ->
+                        case levelTile of
+                            Item Dripper ->
+                                Just xy
+
+                            _ ->
+                                Nothing
+                    )
+
+        bossLocs =
+            levelMap
+                |> Dict.toList
+                |> List.filterMap
+                    (\( xy, levelTile ) ->
+                        case levelTile of
+                            Item Boss ->
+                                Just xy
+
+                            _ ->
+                                Nothing
+                    )
+
+        spawnPlayer ( x, y ) world =
             forNewEntity world
                 &=> ( transforms, { x = toFloat x, y = toFloat y, width = 1, height = 1 } )
                 &=> ( inertias, ( 0, 0 ) )
                 &=> ( players, initPlayer )
                 &=> ( guns, { sinceLast = 0, cooldown = 0.25, spread = 0.2, projectileCount = 8 } )
                 |> Tuple.second
+
+        spawnDripper ( x, y ) world =
+            forNewEntity world
+                &=> ( transforms, { x = toFloat x, y = toFloat y, width = 1, height = 1 } )
+                &=> ( drippers, initDripper Color.red )
+                |> Tuple.second
+
+        spawnBossSpawn ( x, y ) world =
+            forNewEntity world
+                &=> ( transforms, { x = toFloat x, y = toFloat y, width = 1, height = 1 } )
+                &=> ( bossSpawns, {} )
+                |> Tuple.second
+
+        withItems itemSpawn items world =
+            List.foldl itemSpawn world items
     in
-        List.foldl spawn { worldModel | tileMap = newLevel } spawners
+        withItems spawnPlayer spawners { worldModel | tileMap = newLevel }
+            |> withItems spawnDripper dripperLocs
+            |> withItems spawnBossSpawn bossLocs

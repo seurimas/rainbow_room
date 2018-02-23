@@ -5,6 +5,8 @@ import Color exposing (Color)
 
 type LevelItem
     = Spawn
+    | Dripper
+    | Boss
 
 
 type LevelTile

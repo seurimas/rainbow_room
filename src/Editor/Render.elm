@@ -14,14 +14,23 @@ import Color
 import Game.TwoD exposing (..)
 
 
-renderLevelTile : LevelTile -> ( Float, Float ) -> ( Float, Float ) -> Renderable
+renderLevelTile : Maybe LevelTile -> ( Float, Float ) -> ( Float, Float ) -> Renderable
 renderLevelTile tile position size =
     case tile of
-        Solid color ->
+        Just (Solid color) ->
             Render.shape Render.rectangle { color = color, position = position, size = size }
 
-        Item Spawn ->
+        Just (Item Spawn) ->
             Render.shape Render.circle { color = Color.blue, position = position, size = size }
+
+        Just (Item Dripper) ->
+            Render.shape Render.triangle { color = Color.red, position = position, size = size }
+
+        Just (Item Boss) ->
+            Render.shape Render.circle { color = Color.red, position = position, size = size }
+
+        Nothing ->
+            Render.shape Render.ring { color = Color.red, position = position, size = size }
 
 
 renderSelection : EditorModel -> List Renderable
@@ -47,6 +56,7 @@ renderLevelTiles renderConfig tiles =
             renderLevelTile tile ( toFloat x, toFloat y ) ( 1, 1 )
     in
         tiles
+            |> Lazy.List.map (\( x, y, t ) -> ( x, y, Just t ))
             |> Lazy.List.map (\tile -> (drawTile tile))
             |> Lazy.List.toList
 

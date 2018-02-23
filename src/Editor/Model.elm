@@ -40,8 +40,8 @@ type alias EditorModel =
                 { renderConfig : RenderConfig
                 , tileMap : TileMap LevelTile
                 , trackedLevel : TileMap LevelTile
-                , selection : LevelTile
-                , tiles : List LevelTile
+                , selection : Maybe LevelTile
+                , tiles : List (Maybe LevelTile)
                 }
             )
         )
@@ -61,12 +61,15 @@ initModel location =
     , interfaceState = initInterfaceState
     , tileMap = locationTileMap location
     , trackedLevel = getLevel []
-    , selection = Solid Color.blue
+    , selection = Just (Solid Color.blue)
     , tiles =
-        [ Solid Color.blue
-        , Solid Color.red
-        , Solid Color.green
-        , Solid Color.black
-        , Item Spawn
+        [ Just (Solid Color.blue)
+        , Just (Solid Color.red)
+        , Just (Solid Color.green)
+        , Just (Solid Color.black)
+        , Just (Item Spawn)
+        , Just (Item Dripper)
+        , Just (Item Boss)
+        , Nothing
         ]
     }

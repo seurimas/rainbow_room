@@ -4,7 +4,7 @@ import UI.Model exposing (..)
 import Editor.Model exposing (..)
 import Color
 import Input.Utils exposing (mouseGameCoordinates)
-import World.Tilemap exposing (setTile)
+import World.Tilemap exposing (setTile, unsetTile)
 import Level.Model exposing (LevelTile)
 import Navigation exposing (modifyUrl)
 import Level.Json exposing (levelEncode)
@@ -23,7 +23,7 @@ determineUiItems _ ( x, y ) =
         Just LevelEditor
 
 
-determineSelectable : EditorModel -> ( Int, Int ) -> Maybe LevelTile
+determineSelectable : EditorModel -> ( Int, Int ) -> Maybe (Maybe LevelTile)
 determineSelectable model ( x, y ) =
     if y > 32 then
         Nothing
@@ -62,10 +62,18 @@ placeTile ({ interfaceState, inputState, selection } as world) =
                     ( worldX, worldY ) =
                         Debug.log "Place" (mouseGameCoordinates world)
                 in
-                    { world
-                        | tileMap =
-                            setTile ( floor worldX, floor worldY ) selection world.tileMap
-                    }
+                    case selection of
+                        Just aTile ->
+                            { world
+                                | tileMap =
+                                    setTile ( floor worldX, floor worldY ) aTile world.tileMap
+                            }
+
+                        Nothing ->
+                            { world
+                                | tileMap =
+                                    unsetTile ( floor worldX, floor worldY ) world.tileMap
+                            }
 
             _ ->
                 world

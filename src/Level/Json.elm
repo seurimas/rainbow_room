@@ -29,6 +29,12 @@ tileEncode tile =
                 Spawn ->
                     Encode.list [ Encode.string "item", Encode.string "spawn" ]
 
+                Dripper ->
+                    Encode.list [ Encode.string "item", Encode.string "dripper" ]
+
+                Boss ->
+                    Encode.list [ Encode.string "item", Encode.string "boss" ]
+
 
 tileDecode : Decode.Decoder LevelTile
 tileDecode =
@@ -52,6 +58,12 @@ tileDecode =
                         case item of
                             [ "item", "spawn" ] ->
                                 Decode.succeed (Item Spawn)
+
+                            [ "item", "dripper" ] ->
+                                Decode.succeed (Item Dripper)
+
+                            [ "item", "boss" ] ->
+                                Decode.succeed (Item Boss)
 
                             _ ->
                                 Decode.fail "Not an item"
