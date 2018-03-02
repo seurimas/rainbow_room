@@ -34,7 +34,7 @@ paintTheTown collisionEvent world =
                         if (tile.color == aColor) && (tile.timeSince > 0.25) then
                             forEntityById id world
                                 &=> ( inertias
-                                    , if collisionEvent.collisionType == Horizontal then
+                                    , if isHorizontal collisionEvent.collisionType then
                                         ( -vx, vy )
                                       else
                                         ( vx, -vy )

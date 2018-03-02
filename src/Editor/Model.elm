@@ -68,8 +68,8 @@ initModel location =
         , Just (Solid Color.green)
         , Just (Solid Color.black)
         , Just (Item Spawn)
-        , Just (Item Dripper)
-        , Just (Item Boss)
+        , Just (Item Level.Model.Dripper)
+        , Just (Item Level.Model.Boss)
         , Nothing
         ]
     }

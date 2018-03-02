@@ -10,8 +10,36 @@ type alias CollisionPoint tile =
 
 
 type CollisionType
-    = Horizontal
-    | Vertical
+    = North
+    | South
+    | West
+    | East
+
+
+isHorizontal : CollisionType -> Bool
+isHorizontal collisionType =
+    case collisionType of
+        East ->
+            True
+
+        West ->
+            True
+
+        _ ->
+            False
+
+
+isVertical : CollisionType -> Bool
+isVertical collisionType =
+    case collisionType of
+        South ->
+            True
+
+        North ->
+            True
+
+        _ ->
+            False
 
 
 type alias CollisionEvent tile =

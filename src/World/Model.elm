@@ -8,6 +8,7 @@ import Game.TwoD.Camera exposing (fixedArea, Camera, moveTo)
 import Input.Model exposing (Interactable, InputState, initInputState)
 import Color
 import QuickMath exposing (..)
+import Random exposing (Seed, initialSeed)
 
 
 renderWidth =
@@ -39,6 +40,7 @@ type alias WorldModel =
             , renderConfig : RenderConfig
             , uiRenderConfig : RenderConfig
             , tileMap : TileMap WorldTile
+            , seed : Seed
             }
         )
 
@@ -57,6 +59,7 @@ initModel =
     , drops = initComponents
     , blobs = initComponents
     , bosses = initComponents
+    , seed = initialSeed 8675309
     , renderConfig = { time = 0, size = ( 800, 600 ), camera = fixedArea renderUnits ( renderWidth, renderHeight ) |> moveTo ( 0, 0 ) }
     , uiRenderConfig = { time = 0, size = ( 800, 600 ), camera = fixedArea renderUnits ( 800, 600 ) |> moveTo ( 400, 300 ) }
     , inputState = initInputState

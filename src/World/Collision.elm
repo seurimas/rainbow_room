@@ -105,20 +105,20 @@ bottomMost list =
     bestOf (\( _, nowY, _, _, _ ) ( _, nextY, _, _, _ ) -> (nextY > nowY)) list
 
 
-applyCollisionListeners : CollisionType -> List (CollisionListener x) -> EntityID -> Float2 -> Maybe (CollisionPoint x) -> WorldModel -> WorldModel
-applyCollisionListeners collisionType collisionListeners id velocity maybeCollision world =
-    case maybeCollision of
-        Nothing ->
-            world
-
-        Just collisionPoint ->
+applyCollisionListeners : Maybe CollisionType -> List (CollisionListener x) -> EntityID -> Float2 -> Maybe (CollisionPoint x) -> WorldModel -> WorldModel
+applyCollisionListeners maybeCollisionType collisionListeners id velocity maybeCollision world =
+    case ( maybeCollisionType, maybeCollision ) of
+        ( Just collisionType, Just collisionPoint ) ->
             case collisionListeners of
                 first :: rest ->
                     first { location = collisionPoint, entity = id, velocity = velocity, collisionType = collisionType } world
-                        |> applyCollisionListeners collisionType rest id velocity maybeCollision
+                        |> applyCollisionListeners maybeCollisionType rest id velocity maybeCollision
 
                 [] ->
                     world
+
+        _ ->
+            world
 
 
 applyVelocityWithCollisions : List (CollisionListener WorldTile) -> Float -> WorldModel -> WorldModel
@@ -165,28 +165,28 @@ applyVelocityWithCollisions collisionListeners delta world =
                     case horizontalHit tform move of
                         Just ( x, y, tileX, tileY, tile ) ->
                             if getX move > 0 then
-                                ( { tform | x = x - tform.width }, Just ( x, y, tileX, tileY, tile ) )
+                                ( { tform | x = x - tform.width }, Just ( x, y, tileX, tileY, tile ), Just East )
                             else
-                                ( { tform | x = x }, Just ( x, y, tileX, tileY, tile ) )
+                                ( { tform | x = x }, Just ( x, y, tileX, tileY, tile ), Just West )
 
                         Nothing ->
-                            ( { tform | x = tform.x + getX move }, Nothing )
+                            ( { tform | x = tform.x + getX move }, Nothing, Nothing )
 
                 moveY tform move =
                     case verticalHit tform move of
                         Just ( x, y, tileX, tileY, tile ) ->
                             if getY move > 0 then
-                                ( { tform | y = y - tform.height }, Just ( x, y, tileX, tileY, tile ) )
+                                ( { tform | y = y - tform.height }, Just ( x, y, tileX, tileY, tile ), Just North )
                             else
-                                ( { tform | y = y }, Just ( x, y, tileX, tileY, tile ) )
+                                ( { tform | y = y }, Just ( x, y, tileX, tileY, tile ), Just South )
 
                         Nothing ->
-                            ( { tform | y = tform.y + getY move }, Nothing )
+                            ( { tform | y = tform.y + getY move }, Nothing, Nothing )
 
-                ( movedX, collisionX ) =
+                ( movedX, collisionX, collisionTypeX ) =
                     moveX transform movement
 
-                ( movedY, collisionY ) =
+                ( movedY, collisionY, collisionTypeY ) =
                     moveY movedX movement
             in
                 ( { e
@@ -204,7 +204,7 @@ applyVelocityWithCollisions collisionListeners delta world =
                                     identity
                                )
                   }
-                , applyCollisionListeners Horizontal collisionListeners e.id velocity collisionX >> applyCollisionListeners Vertical collisionListeners e.id velocity collisionY
+                , applyCollisionListeners collisionTypeX collisionListeners e.id velocity collisionX >> applyCollisionListeners collisionTypeY collisionListeners e.id velocity collisionY
                 )
     in
         stepEntitiesAndThen (entities2 transforms inertias) moveAndTouch world

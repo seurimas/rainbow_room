@@ -98,12 +98,17 @@ drops =
     componentSpec .drops (\drops world -> { world | drops = drops })
 
 
-type alias Blob =
-    {}
+type Blob
+    = Waiting Float
+    | Moving
 
 
 blobs =
     componentSpec .blobs (\blobs world -> { world | blobs = blobs })
+
+
+initBlob =
+    Waiting 0
 
 
 type alias BossSpawn =
@@ -129,3 +134,7 @@ deletor =
         &-> players
         &-> painters
         &-> paintables
+        &-> drops
+        &-> bosses
+        &-> bossSpawns
+        &-> blobs

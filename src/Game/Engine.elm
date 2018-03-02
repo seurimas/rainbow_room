@@ -10,7 +10,7 @@ import World.Physical exposing (applyGravity, breakInertias)
 import World.Collision exposing (applyVelocityWithCollisions)
 import Player.Systems exposing (cameraFollow, applyPlayerMovement, transferPlayerInput)
 import World.Collision.Painting exposing (setThePaint, paintTheTown)
-import Enemies.Systems exposing (stepDrippers, dripDrippers)
+import Enemies.Systems exposing (stepDrippers, dripDrippers, composeBlob, bounceBlob, landBlob)
 
 
 engine =
@@ -22,7 +22,8 @@ engine =
         , timedSystem setThePaint
         , timedSystem stepDrippers
         , untimedSystem dripDrippers
-        , timedSystem (applyVelocityWithCollisions [ paintTheTown ])
+        , timedSystem bounceBlob
+        , timedSystem (applyVelocityWithCollisions [ paintTheTown, composeBlob, landBlob ])
         , timedSystem applyPlayerMovement
         , timedSystem cameraFollow
         ]
